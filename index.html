@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT PHOENIX | Neural & Dopamine Reset Commander</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#090d16',
+                        cardBg: '#111827',
+                        cardBorder: '#1f2937',
+                        accentGreen: '#10b981',
+                        accentCyan: '#06b6d4',
+                        dangerRed: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #090d16;
+            color: #f3f4f6;
+        }
+        .glow-green {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black">
+
+    <!-- Top Navigation -->
+    <header class="border-b border-cardBorder bg-cardBg/60 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center glow-green">
+                    <i data-lucide="shield-alert" class="w-6 h-6 text-black stroke-[2.5]"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">PROJECT PHOENIX</h1>
+                    <p class="text-xs text-gray-400 font-medium">Neural Reset & Dopamine Control</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="hidden sm:flex items-center space-x-2 bg-darkBg border border-cardBorder px-3 py-1.5 rounded-lg text-xs font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="header-streak-badge" class="text-gray-300">Streak: Day 1</span>
+                </div>
+                <button onclick="resetDataModal()" class="text-xs text-gray-400 hover:text-red-400 transition-colors border border-cardBorder px-3 py-1.5 rounded-lg">Reset Protocol</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Sidebar / Navigation Tabs -->
+        <aside class="lg:col-span-3 space-y-4">
+            <div class="bg-cardBg border border-cardBorder rounded-2xl p-4 space-y-2">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Command Center</span>
+                </button>
+                <button onclick="switchTab('assessment')" id="nav-assessment" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:bg-cardBorder/50 hover:text-gray-200 transition-all">
+                    <i data-lucide="brain" class="w-5 h-5"></i>
+                    <span>Dopamine Audit</span>
+                </button>
+                <button onclick="switchTab('tracker')" id="nav-tracker" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:bg-cardBorder/50 hover:text-gray-200 transition-all">
+                    <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                    <span>30-Day Hard Mode</span>
+                </button>
+                <button onclick="switchTab('panic')" id="nav-panic" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:bg-cardBorder/50 hover:text-gray-200 transition-all">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                    <span>Emergency Urge Surfer</span>
+                </button>
+                <button onclick="switchTab('transmute')" id="nav-transmute" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:bg-cardBorder/50 hover:text-gray-200 transition-all">
+                    <i data-lucide="flame" class="w-5 h-5"></i>
+                    <span>Energy Transmutation</span>
+                </button>
+            </div>
+
+            <!-- Commander Status Card -->
+            <div class="bg-gradient-to-br from-cardBg to-darkBg border border-cardBorder rounded-2xl p-5 relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
+                <h3 class="font-bold text-sm text-gray-200 mb-2 flex items-center justify-between">
+                    <span>Commander Directive</span>
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                </h3>
+                <p class="text-xs text-gray-400 leading-relaxed mb-4">"Zero porn. Zero masturbation. Channel the raw fire into code, fitness, and building your empire."</p>
+                <div class="bg-darkBg/80 border border-cardBorder rounded-xl p-3 flex items-center justify-between text-xs">
+                    <span class="text-gray-400">Current Phase</span>
+                    <span id="sidebar-phase" class="font-bold text-cyan-400">Shockwave (Day 1)</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Dynamic Panels -->
+        <section class="lg:col-span-9 space-y-6">
+
+            <!-- TAB 1: COMMAND CENTER -->
+            <div id="tab-content-dashboard" class="space-y-6">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-emerald-950/40 via-cardBg to-cyan-950/40 border border-cardBorder rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                    <div class="relative z-10 max-w-2xl">
+                        <span class="inline-block bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1 rounded-full font-semibold mb-3">MISSION ACTIVE</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">Welcome Back, Commander.</h2>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-6">Your brain is healing. Every time you resist a cheap digital spike, you wire your neural pathways for deep focus, creative mastery, and real-world dominance.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="switchTab('panic')" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-5 py-2.5 rounded-xl text-sm transition-all flex items-center space-x-2 shadow-lg shadow-emerald-500/20">
+                                <i data-lucide="siren" class="w-4 h-4"></i>
+                                <span>Emergency Urge Surfer</span>
+                            </button>
+                            <button onclick="switchTab('tracker')" class="bg-cardBg hover:bg-cardBorder border border-cardBorder text-gray-200 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all flex items-center space-x-2">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400"></i>
+                                <span>View 30-Day Grid</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                            <i data-lucide="flame" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">Clean Streak</p>
+                            <h3 id="stat-streak" class="text-2xl font-extrabold text-white">1 Day</h3>
+                        </div>
+                    </div>
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                            <i data-lucide="zap" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">Dopamine Baseline</p>
+                            <h3 id="stat-baseline" class="text-2xl font-extrabold text-white">Recalibrating</h3>
+                        </div>
+                    </div>
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+                            <i data-lucide="target" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">Protocol Goal</p>
+                            <h3 class="text-2xl font-extrabold text-white">30 Days</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.2em] text-emerald-400 font-semibold">Daily Audit History</p>
+                            <h3 class="text-xl font-extrabold text-white mt-1">Progress & Recovery Score</h3>
+                        </div>
+                        <button onclick="openAuditForDate(getCurrentProgramDate())" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-4 py-2 rounded-xl text-xs transition-all">Complete Today’s Audit</button>
+                    </div>
+                    <div id="history-chart" class="flex items-end gap-2 h-32 px-2 py-3 bg-darkBg border border-cardBorder rounded-xl"></div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="min-w-full text-left text-xs text-gray-300">
+                            <thead>
+                                <tr class="border-b border-cardBorder text-gray-400">
+                                    <th class="py-2 pr-4 font-medium">Date</th>
+                                    <th class="py-2 pr-4 font-medium">Score</th>
+                                    <th class="py-2 pr-4 font-medium">Badge</th>
+                                    <th class="py-2 font-medium">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-log-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Action Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-base text-white flex items-center space-x-2">
+                                <i data-lucide="compass" class="w-5 h-5 text-emerald-400"></i>
+                                <span>The 3 Rules of Transmutation</span>
+                            </h3>
+                            <span class="text-xs bg-darkBg border border-cardBorder px-2.5 py-1 rounded-lg text-gray-400">Core Axiom</span>
+                        </div>
+                        <ul class="space-y-3 text-xs sm:text-sm text-gray-300">
+                            <li class="flex items-start space-x-3">
+                                <span class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">1</span>
+                                <span><strong>Body in Motion:</strong> When an urge strikes, drop to the floor and do push-ups immediately. Do not sit still.</span>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <span class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">2</span>
+                                <span><strong>Phone Quarantine:</strong> No phone in the bedroom or bathroom. Keep digital friction high.</span>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <span class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">3</span>
+                                <span><strong>Failure is Data:</strong> If you slip, analyze the exact trigger without guilt, reset instantly, and double the friction.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-base text-white flex items-center space-x-2">
+                                <i data-lucide="activity" class="w-5 h-5 text-cyan-400"></i>
+                                <span>Daily Dopamine Re-Routing</span>
+                            </h3>
+                            <button onclick="switchTab('transmute')" class="text-xs text-cyan-400 hover:underline font-semibold">Open Matrix →</button>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">Replace cheap pixel dopamine with high-octane physical and mental outputs:</p>
+                        <div class="space-y-2">
+                            <div class="bg-darkBg border border-cardBorder p-3 rounded-xl flex items-center justify-between text-xs">
+                                <span class="text-gray-300 font-medium">Heavy Resistance Training / Gym</span>
+                                <span class="text-emerald-400 font-bold">+Endorphins</span>
+                            </div>
+                            <div class="bg-darkBg border border-cardBorder p-3 rounded-xl flex items-center justify-between text-xs">
+                                <span class="text-gray-300 font-medium">Deep Work / Coding / Brand Building</span>
+                                <span class="text-cyan-400 font-bold">+Flow State</span>
+                            </div>
+                            <div class="bg-darkBg border border-cardBorder p-3 rounded-xl flex items-center justify-between text-xs">
+                                <span class="text-gray-300 font-medium">Sketching / Creative Design</span>
+                                <span class="text-purple-400 font-bold">+Dopamine Mastery</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: DOPAMINE AUDIT / ASSESSMENT -->
+            <div id="tab-content-assessment" class="hidden space-y-6">
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 space-y-6">
+                    <div>
+                        <span class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">DIAGNOSTIC TOOL</span>
+                        <h2 class="text-2xl font-extrabold text-white mt-2">Dopamine Overload & Trigger Audit</h2>
+                        <p id="audit-date-label" class="text-sm text-gray-400 mt-1">Audit Date: Oct 17, 2026 • Allowed</p>
+                    </div>
+
+                    <div id="quiz-container" class="space-y-6">
+                        <!-- Quiz questions injected dynamically -->
+                    </div>
+
+                    <div id="quiz-results" class="hidden bg-darkBg border border-emerald-500/30 rounded-2xl p-6 space-y-4 glow-green">
+                        <h3 class="text-lg font-bold text-emerald-400 flex items-center space-x-2">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                            <span>Audit Complete: Overload Score Calculated</span>
+                        </h3>
+                        <div id="quiz-score-display" class="text-3xl font-extrabold text-white">Score: 85/100 (Severe Overload)</div>
+                        <p id="quiz-prescription" class="text-sm text-gray-300 leading-relaxed"></p>
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <button onclick="submitDailyAudit()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-4 py-2 rounded-xl text-xs transition-all">Save Daily Audit</button>
+                            <button onclick="retakeQuiz()" class="bg-cardBorder hover:bg-cardBg text-gray-200 text-xs font-bold px-4 py-2 rounded-xl transition-all">Retake Audit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: 30-DAY HARD MODE TRACKER -->
+            <div id="tab-content-tracker" class="hidden space-y-6">
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs text-cyan-400 font-semibold bg-cyan-500/10 border border-cyan-500/20 px-3 py-1 rounded-full">HARD MODE PROTOCOL</span>
+                            <h2 class="text-2xl font-extrabold text-white mt-2">30-Day Zero Tolerance Grid</h2>
+                            <p class="text-sm text-gray-400 mt-1">Click any day to toggle your status. Protect your streak like your life depends on it.</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-darkBg border border-cardBorder px-4 py-2 rounded-xl text-center">
+                                <span class="block text-xs text-gray-400">Completed Days</span>
+                                <span id="grid-completed-count" class="font-extrabold text-emerald-400 text-lg">0 / 30</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 30-Day Grid Container -->
+                    <div id="thirty-day-grid" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-3">
+                        <!-- Injected via JS -->
+                    </div>
+
+                    <div class="bg-darkBg border border-cardBorder rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 gap-3">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-1.5">
+                                <span class="w-3 h-3 rounded bg-emerald-500"></span>
+                                <span>Clean & Victorious</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5">
+                                <span class="w-3 h-3 rounded bg-cardBorder"></span>
+                                <span>Pending / Future</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5">
+                                <span class="w-3 h-3 rounded bg-red-500"></span>
+                                <span>Relapse (Data)</span>
+                            </div>
+                        </div>
+                        <button onclick="logTodayClean()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-4 py-2 rounded-lg transition-all">Check-in Today (Clean)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: EMERGENCY URGE SURFER -->
+            <div id="tab-content-panic" class="hidden space-y-6">
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 text-center space-y-6 max-w-2xl mx-auto">
+                    <div>
+                        <span class="text-xs text-red-400 font-semibold bg-red-500/10 border border-red-500/20 px-3 py-1 rounded-full uppercase tracking-wider">Panic Button / Urge Surfer</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Urge Surfing Protocol</h2>
+                        <p class="text-sm text-gray-400 mt-1">Cravings peak and fade like ocean waves. They cannot destroy you unless you act. Breathe and ride it out for 3 minutes.</p>
+                    </div>
+
+                    <div class="py-8">
+                        <div id="timer-display" class="text-6xl sm:text-7xl font-black text-emerald-400 font-mono tracking-wider mb-3">03:00</div>
+                        <div id="timer-instruction" class="text-sm text-gray-300 font-medium">Breathe in deep through your nose...</div>
+                    </div>
+
+                    <div class="flex justify-center space-x-4">
+                        <button id="timer-start-btn" onclick="startUrgeTimer()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 py-3 rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20">Start 3-Min Surge</button>
+                        <button onclick="resetUrgeTimer()" class="bg-cardBorder hover:bg-gray-800 text-gray-300 font-semibold px-6 py-3 rounded-xl text-sm transition-all">Reset</button>
+                    </div>
+
+                    <div class="bg-darkBg border border-cardBorder rounded-xl p-4 text-left space-y-2">
+                        <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Emergency Commander Directives:</h4>
+                        <ul class="text-xs text-gray-400 space-y-1 list-disc list-inside">
+                            <li>Put your phone down flat on the table right now.</li>
+                            <li>Stand up and walk away from your screen.</li>
+                            <li>Do 20 push-ups or drink 500ml of ice-cold water immediately.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: ENERGY TRANSMUTATION MATRIX -->
+            <div id="tab-content-transmute" class="hidden space-y-6">
+                <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/20 px-3 py-1 rounded-full">HIGH ROI EXECUTION</span>
+                            <h2 class="text-2xl font-extrabold text-white mt-2">Energy Transmutation Matrix</h2>
+                            <p class="text-sm text-gray-400 mt-1">Convert raw sexual & nervous energy into business, fitness, and skill mastery tasks.</p>
+                        </div>
+                        <button onclick="openAddTaskModal()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Mission Task</span>
+                        </button>
+                    </div>
+
+                    <!-- Task List -->
+                    <div id="transmute-task-list" class="space-y-3">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-cardBorder bg-cardBg/30 py-6 mt-12 text-center text-xs text-gray-500">
+        <p>Project Phoenix Neural Reset • Built for Absolute Focus & Elite Execution.</p>
+    </footer>
+
+    <!-- Add Task Modal -->
+    <div id="task-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 max-w-md w-full space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-white">Add Transmutation Task</h3>
+                <button onclick="closeAddTaskModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1 font-medium">Task / Mission Name</label>
+                    <input type="text" id="new-task-title" placeholder="e.g., Push-ups & Dumbbell Workout" class="w-full bg-darkBg border border-cardBorder rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1 font-medium">Category</label>
+                    <select id="new-task-category" class="w-full bg-darkBg border border-cardBorder rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        <option value="Fitness">Fitness & Body</option>
+                        <option value="Business">Business & Coding</option>
+                        <option value="Mindset">Mindset & Art</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button onclick="closeAddTaskModal()" class="bg-cardBorder hover:bg-gray-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold">Cancel</button>
+                <button onclick="saveNewTask()" class="bg-emerald-500 hover:bg-emerald-400 text-black px-5 py-2 rounded-xl text-xs font-bold">Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        const PROGRAM_START_DATE = new Date(2026, 9, 17);
+        const PROGRAM_END_DATE = new Date(2026, 10, 16);
+        const STORAGE_KEYS = {
+            state: 'phoenix_state_v3',
+            history: 'phoenix_history_log_v3'
+        };
+
+        const dailyQuizQuestions = [
+            {
+                q: 'Did you watch adult content (Porn) today?',
+                options: [
+                    { label: 'No', points: 10 },
+                    { label: 'Once', points: 5 },
+                    { label: '2-3 times', points: 2 },
+                    { label: 'Binging', points: 0 }
+                ]
+            },
+            {
+                q: 'Did you masturbate today?',
+                options: [
+                    { label: 'No', points: 10 },
+                    { label: 'As per schedule', points: 8 },
+                    { label: 'Unplanned relapse', points: 2 },
+                    { label: 'Multiple times', points: 0 }
+                ]
+            },
+            {
+                q: 'What was your energy level today?',
+                options: [
+                    { label: 'High/Peak', points: 10 },
+                    { label: 'Good', points: 7 },
+                    { label: 'Moderate', points: 5 },
+                    { label: 'Extremely Low', points: 0 }
+                ]
+            },
+            {
+                q: 'How was your mental focus/brain fog?',
+                options: [
+                    { label: 'Crystal Clear', points: 10 },
+                    { label: 'Good', points: 7 },
+                    { label: 'Slight Fog', points: 4 },
+                    { label: 'Heavy Fog', points: 0 }
+                ]
+            },
+            {
+                q: 'Did you take your smartphone to the bed/bathroom?',
+                options: [
+                    { label: 'Never', points: 10 },
+                    { label: 'Once', points: 5 },
+                    { label: 'Often', points: 2 },
+                    { label: 'Kept it whole time', points: 0 }
+                ]
+            },
+            {
+                q: 'Did you perform physical workout / heavy exercises today?',
+                options: [
+                    { label: 'Intense Workout', points: 10 },
+                    { label: 'Light exercise', points: 7 },
+                    { label: 'Short walk', points: 4 },
+                    { label: 'Zero physical activity', points: 0 }
+                ]
+            },
+            {
+                q: 'How much time did you spend on Doom Scrolling (Shorts/Reels/Social Media)?',
+                options: [
+                    { label: 'Less than 15 mins', points: 10 },
+                    { label: '15-45 mins', points: 7 },
+                    { label: '1-2 hours', points: 3 },
+                    { label: '2+ hours', points: 0 }
+                ]
+            },
+            {
+                q: 'How did you handle sexual urges/triggers today?',
+                options: [
+                    { label: 'Urge Surfed / Did Pushups', points: 10 },
+                    { label: 'Diverted mind', points: 7 },
+                    { label: 'Struggled but survived', points: 4 },
+                    { label: 'Gave in', points: 0 }
+                ]
+            },
+            {
+                q: 'Did you work on your core mission/business/learning today?',
+                options: [
+                    { label: '3+ hours deep work', points: 10 },
+                    { label: '1-2 hours', points: 7 },
+                    { label: 'Less than 1 hour', points: 3 },
+                    { label: 'Procrastinated', points: 0 }
+                ]
+            },
+            {
+                q: 'Overall mood & self-control score today?',
+                options: [
+                    { label: 'Master of Mind', points: 10 },
+                    { label: 'Good control', points: 7 },
+                    { label: 'Average', points: 4 },
+                    { label: 'Drained/Regret', points: 0 }
+                ]
+            }
+        ];
+
+        let appState = null;
+        let userQuizAnswers = {};
+        let currentAuditDate = getIsoDate(PROGRAM_START_DATE);
+
+        function getIsoDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDisplayDate(dateString) {
+            const date = new Date(`${dateString}T00:00:00`);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatMonthDay(dateString) {
+            const date = new Date(`${dateString}T00:00:00`);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function getProgressiveStatus(dateString) {
+            const diffDays = Math.floor((new Date(`${dateString}T00:00:00`) - PROGRAM_START_DATE) / 86400000);
+
+            if (diffDays <= 6) return diffDays % 2 === 0 ? 'Allowed' : 'Cut';
+            if (diffDays <= 13) return diffDays % 3 === 1 ? 'Allowed' : 'Cut';
+            if (diffDays <= 20) return diffDays % 4 === 2 ? 'Allowed' : 'Cut';
+            return 'Cut';
+        }
+
+        function buildCalendarMatrix() {
+            const matrix = [];
+            const cursor = new Date(PROGRAM_START_DATE);
+            while (cursor <= PROGRAM_END_DATE) {
+                const iso = getIsoDate(cursor);
+                matrix.push({
+                    date: iso,
+                    label: formatMonthDay(iso),
+                    status: getProgressiveStatus(iso),
+                    auditStatus: 'Pending',
+                    score: null
+                });
+                cursor.setDate(cursor.getDate() + 1);
+            }
+            return matrix;
+        }
+
+        function loadState() {
+            const savedState = JSON.parse(localStorage.getItem(STORAGE_KEYS.state) || 'null');
+            const savedHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || '[]');
+
+            appState = {
+                streak: 1,
+                tasks: [
+                    { id: 1, title: 'Morning Push-ups & Cold Shower', category: 'Fitness', completed: false },
+                    { id: 2, title: 'Code/Build Web App for 2 Hours', category: 'Business', completed: false },
+                    { id: 3, title: 'No Phone in Bedroom Rule', category: 'Mindset', completed: true }
+                ],
+                historyLog: Array.isArray(savedHistory) ? savedHistory : [],
+                calendar: buildCalendarMatrix()
+            };
+
+            if (savedState) {
+                appState = { ...appState, ...savedState };
+            }
+
+            if (!Array.isArray(appState.historyLog)) {
+                appState.historyLog = [];
+            }
+
+            appState.calendar = buildCalendarMatrix().map(day => {
+                const match = appState.historyLog.find(record => record.date === day.date);
+                return {
+                    ...day,
+                    auditStatus: match ? 'Completed' : 'Pending',
+                    score: match ? match.score : null
+                };
+            });
+
+            appState.streak = calculateCleanStreak();
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEYS.state, JSON.stringify(appState));
+            localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(appState.historyLog));
+            updateUI();
+        }
+
+        function calculateCleanStreak() {
+            const ordered = [...appState.historyLog].sort((a, b) => new Date(a.date) - new Date(b.date));
+            let streak = 0;
+            let lastDate = null;
+
+            for (const record of ordered) {
+                const recordDate = new Date(`${record.date}T00:00:00`);
+                if (lastDate && (recordDate - lastDate) > 86400000) break;
+                if (record.score >= 70) {
+                    streak += 1;
+                    lastDate = recordDate;
+                } else {
+                    break;
+                }
+            }
+            return streak || 1;
+        }
+
+        function getCurrentProgramDate() {
+            return getIsoDate(PROGRAM_START_DATE);
+        }
+
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'assessment', 'tracker', 'panic', 'transmute'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-content-${t}`).classList.add('hidden');
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (navBtn) {
+                    navBtn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:bg-cardBorder/50 hover:text-gray-200 transition-all';
+                }
+            });
+
+            document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateUI() {
+            const streakValue = appState.streak || 1;
+            document.getElementById('stat-streak').innerText = `${streakValue} Day${streakValue > 1 ? 's' : ''}`;
+            document.getElementById('header-streak-badge').innerText = `Streak: Day ${streakValue}`;
+
+            let phaseText = 'Shockwave (Day 1)';
+            if (streakValue >= 7 && streakValue <= 17) phaseText = 'Stabilization';
+            if (streakValue > 17) phaseText = 'Power Peak';
+            document.getElementById('sidebar-phase').innerText = phaseText;
+
+            const baselineText = appState.historyLog.length ? `${Math.round(appState.historyLog.reduce((sum, item) => sum + item.score, 0) / appState.historyLog.length)}/100` : 'Recalibrating';
+            document.getElementById('stat-baseline').innerText = baselineText;
+
+            renderGrid();
+            renderHistoryDashboard();
+            renderTasks();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderGrid() {
+            const gridContainer = document.getElementById('thirty-day-grid');
+            const completed = appState.calendar.filter(day => day.auditStatus === 'Completed').length;
+            document.getElementById('grid-completed-count').innerText = `${completed} / 30`;
+
+            const html = appState.calendar.map(day => {
+                const isAllowed = day.status === 'Allowed';
+                const isCompleted = day.auditStatus === 'Completed';
+                const classes = isAllowed ? 'bg-red-500/10 border-red-500/60 text-red-200' : 'bg-emerald-500/10 border-emerald-500/60 text-emerald-200';
+                const badgeClasses = isAllowed ? 'bg-red-500/15 border border-red-500/40 text-red-200' : 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-200';
+                const statusText = isCompleted ? 'Completed' : 'Pending';
+                const dayNumber = new Date(`${day.date}T00:00:00`).getDate();
+
+                return `
+                    <button onclick="openAuditForDate('${day.date}')" class="min-h-[90px] rounded-xl border p-2 text-left transition-all hover:scale-[1.01] ${classes}">
+                        <div class="text-[10px] uppercase tracking-wide text-gray-400">${new Date(`${day.date}T00:00:00`).toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                        <div class="mt-2 text-lg font-extrabold">${dayNumber}</div>
+                        <span class="inline-block mt-2 px-2 py-1 rounded-full text-[9px] font-bold ${badgeClasses}">${day.status}</span>
+                        <div class="mt-2 text-[10px] ${isCompleted ? 'text-gray-200' : 'text-gray-400'}">${statusText}</div>
+                    </button>
+                `;
+            }).join('');
+
+            gridContainer.innerHTML = html;
+        }
+
+        function renderHistoryDashboard() {
+            const historyChart = document.getElementById('history-chart');
+            const historyLogBody = document.getElementById('history-log-body');
+            const source = [...appState.historyLog].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-10);
+
+            if (!source.length) {
+                historyChart.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-gray-500">No daily audits yet.</div>';
+                historyLogBody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-gray-500">Your history will appear here after the first audit.</td></tr>';
+                return;
+            }
+
+            const maxScore = 100;
+            const chartBars = source.map(item => {
+                const height = Math.max(10, (item.score / maxScore) * 100);
+                return `
+                    <div class="flex-1 flex flex-col items-center justify-end h-full">
+                        <div class="w-full max-w-[18px] rounded-t-md bg-gradient-to-t from-emerald-500 to-cyan-400" style="height:${height}%"></div>
+                        <span class="mt-2 text-[9px] text-gray-500">${new Date(`${item.date}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    </div>
+                `;
+            }).join('');
+            historyChart.innerHTML = chartBars;
+
+            historyLogBody.innerHTML = [...appState.historyLog].sort((a, b) => new Date(b.date) - new Date(a.date)).map(item => {
+                const badgeClass = item.status === 'Allowed' ? 'bg-red-500/15 text-red-200 border border-red-500/40' : 'bg-emerald-500/15 text-emerald-200 border border-emerald-500/40';
+                return `
+                    <tr class="border-b border-cardBorder">
+                        <td class="py-2 pr-4">${formatDisplayDate(item.date)}</td>
+                        <td class="py-2 pr-4 font-bold ${item.score >= 70 ? 'text-emerald-300' : 'text-amber-300'}">${item.score}/100</td>
+                        <td class="py-2 pr-4"><span class="inline-block px-2 py-1 rounded-full text-[10px] font-semibold ${badgeClass}">${item.status}</span></td>
+                        <td class="py-2">${item.score >= 70 ? 'Stable' : 'Needs reset'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            if (!container) return;
+
+            let html = '';
+            dailyQuizQuestions.forEach((item, idx) => {
+                const selected = userQuizAnswers[idx];
+                html += `
+                    <div class="bg-darkBg border border-cardBorder rounded-xl p-5 space-y-3">
+                        <h4 class="font-bold text-sm text-gray-200">Q${idx + 1}. ${item.q}</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                `;
+                item.options.forEach((option) => {
+                    const optionIndex = item.options.indexOf(option);
+                    const isSelected = selected === optionIndex;
+                    html += `
+                        <button type="button" onclick="selectQuizOption(${idx}, ${optionIndex})" class="text-left text-xs p-3 rounded-lg border transition-all ${isSelected ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold' : 'bg-cardBg border-cardBorder text-gray-300 hover:border-gray-600'}">
+                            ${option.label} <span class="text-gray-400">[${option.points} pts]</span>
+                        </button>
+                    `;
+                });
+                html += '</div></div>';
+            });
+
+            container.innerHTML = html;
+            const resultBox = document.getElementById('quiz-results');
+            if (resultBox) resultBox.classList.add('hidden');
+        }
+
+        function selectQuizOption(questionIndex, optionIndex) {
+            userQuizAnswers[questionIndex] = optionIndex;
+            renderQuiz();
+            if (Object.keys(userQuizAnswers).length === dailyQuizQuestions.length) {
+                const score = calculateQuizResult();
+                const resultBox = document.getElementById('quiz-results');
+                if (resultBox) {
+                    resultBox.classList.remove('hidden');
+                    document.getElementById('quiz-score-display').innerText = `Daily Score: ${score}/100`;
+                    document.getElementById('quiz-prescription').innerText = getPrescriptionText(score, currentAuditDate);
+                }
+            }
+        }
+
+        function calculateQuizResult() {
+            return dailyQuizQuestions.reduce((sum, question, idx) => {
+                const selectedIndex = userQuizAnswers[idx];
+                if (selectedIndex === undefined) return sum;
+                return sum + question.options[selectedIndex].points;
+            }, 0);
+        }
+
+        function getPrescriptionText(score, dateString) {
+            const isAllowed = getProgressiveStatus(dateString) === 'Allowed';
+            if (score >= 85) {
+                return isAllowed
+                    ? 'Strong control today. This was a high-probability relapse day, so you handled it with discipline. Keep the friction high and stay in motion.'
+                    : 'Excellent recovery. Your system is stabilizing. Protect this momentum with sleep, exercise, and deep work.';
+            }
+            if (score >= 60) {
+                return 'Good control, but you still have room to tighten the protocol. Review triggers, remove friction, and protect your morning routine.';
+            }
+            if (score >= 40) {
+                return 'This was a vulnerable day. Do not shame yourself. Identify the trigger, reset immediately, and increase physical transmutation.';
+            }
+            return 'This score signals a high-risk pattern. Reduce exposure, remove the phone from your environment, and rerun your emergency urge protocol immediately.';
+        }
+
+        function openAuditForDate(dateString) {
+            currentAuditDate = dateString;
+            userQuizAnswers = {};
+            renderQuiz();
+            switchTab('assessment');
+            const dateText = document.getElementById('audit-date-label');
+            if (dateText) {
+                dateText.innerText = `Audit Date: ${formatDisplayDate(dateString)} • ${getProgressiveStatus(dateString)}`;
+            }
+        }
+
+        function submitDailyAudit() {
+            if (Object.keys(userQuizAnswers).length !== dailyQuizQuestions.length) {
+                alert('Please answer all 10 questions before submitting your daily audit.');
+                return;
+            }
+
+            const score = calculateQuizResult();
+            const status = getProgressiveStatus(currentAuditDate) === 'Allowed' ? 'Allowed' : 'Clean/Cut';
+            const record = {
+                date: currentAuditDate,
+                score,
+                status,
+                answers: dailyQuizQuestions.map((question, index) => ({
+                    question: question.q,
+                    answer: question.options[userQuizAnswers[index]].label,
+                    points: question.options[userQuizAnswers[index]].points
+                })),
+                timestamp: new Date().toISOString()
+            };
+
+            const existingIndex = appState.historyLog.findIndex(entry => entry.date === currentAuditDate);
+            if (existingIndex >= 0) {
+                appState.historyLog[existingIndex] = record;
+            } else {
+                appState.historyLog.push(record);
+            }
+
+            appState.calendar = buildCalendarMatrix().map(day => {
+                const match = appState.historyLog.find(entry => entry.date === day.date);
+                return {
+                    ...day,
+                    auditStatus: match ? 'Completed' : 'Pending',
+                    score: match ? match.score : null
+                };
+            });
+            appState.streak = calculateCleanStreak();
+            saveState();
+            switchTab('dashboard');
+        }
+
+        function retakeQuiz() {
+            userQuizAnswers = {};
+            renderQuiz();
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('transmute-task-list');
+            if (!container) return;
+
+            if (appState.tasks.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">No tasks added yet. Add a transmutation mission.</p>';
+                return;
+            }
+
+            container.innerHTML = appState.tasks.map(task => `
+                <div class="bg-darkBg border border-cardBorder rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})" class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-semibold ${task.completed ? 'line-through text-gray-500' : 'text-gray-200'}">${task.title}</h4>
+                            <span class="text-[10px] text-purple-400 font-medium">${task.category}</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteTask(${task.id})" class="text-gray-500 hover:text-red-400 text-xs"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function toggleTask(id) {
+            appState.tasks = appState.tasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task);
+            saveState();
+        }
+
+        function openAddTaskModal() {
+            document.getElementById('task-modal').classList.remove('hidden');
+        }
+
+        function closeAddTaskModal() {
+            document.getElementById('task-modal').classList.add('hidden');
+            document.getElementById('new-task-title').value = '';
+        }
+
+        function saveNewTask() {
+            const title = document.getElementById('new-task-title').value.trim();
+            const category = document.getElementById('new-task-category').value;
+            if (!title) return;
+
+            appState.tasks.push({ id: Date.now(), title, category, completed: false });
+            saveState();
+            closeAddTaskModal();
+        }
+
+        function deleteTask(id) {
+            appState.tasks = appState.tasks.filter(task => task.id !== id);
+            saveState();
+        }
+
+        function resetDataModal() {
+            if (confirm('Are you sure you want to reset your entire detox protocol?')) {
+                localStorage.removeItem(STORAGE_KEYS.state);
+                localStorage.removeItem(STORAGE_KEYS.history);
+                location.reload();
+            }
+        }
+
+        function logTodayClean() {
+            openAuditForDate(getCurrentProgramDate());
+        }
+
+        let timerInterval = null;
+        let timeLeft = 180;
+        let isTimerRunning = false;
+
+        function startUrgeTimer() {
+            if (isTimerRunning) return;
+            isTimerRunning = true;
+            document.getElementById('timer-start-btn').innerText = 'Surfing Urge...';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                document.getElementById('timer-display').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 120 && timeLeft > 60) {
+                    document.getElementById('timer-instruction').innerText = 'The wave is peaking. Breathe out slowly. Drop and do 20 push-ups.';
+                } else if (timeLeft <= 60) {
+                    document.getElementById('timer-instruction').innerText = 'The craving is dissolving. You control your mind, not your impulses.';
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    timeLeft = 180;
+                    document.getElementById('timer-display').innerText = '00:00';
+                    document.getElementById('timer-instruction').innerText = 'Victory! The urge has passed. Return to your mission.';
+                    document.getElementById('timer-start-btn').innerText = 'Start 3-Min Surge';
+                }
+            }, 1000);
+        }
+
+        function resetUrgeTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timeLeft = 180;
+            document.getElementById('timer-display').innerText = '03:00';
+            document.getElementById('timer-instruction').innerText = 'Breathe in deep through your nose...';
+            document.getElementById('timer-start-btn').innerText = 'Start 3-Min Surge';
+        }
+
+        window.onload = function() {
+            loadState();
+            renderQuiz();
+            updateUI();
+        };
+    </script>
+</body>
+</html>
